@@ -49,7 +49,7 @@ function App() {
       />
 
       <button onClick={enviarImagem}>Enviar</button>
-
+      <p>Valor: {valor}</p>
       <div style={{ display: "flex", gap: "20px", marginTop: "20px" }}>
         {preview && (
           <div>
@@ -68,5 +68,4 @@ function App() {
     </section>
   );
 }
-
 export default App;
