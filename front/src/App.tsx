@@ -33,6 +33,7 @@ function App() {
       <input
         type="file"
         accept="image/*"
+        title="a"
         onChange={(e) => {
           if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
@@ -44,6 +45,7 @@ function App() {
 
       <input
         type="number"
+        title="a"
         value={valor}
         onChange={(e) => setValor(Number(e.target.value))}
       />
