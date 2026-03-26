@@ -1,6 +1,8 @@
 import React, { useRef, useState } from "react";
 import Nav from "./components/nav";
 import Canvas from "./components/canvas";
+import FiltersBar from "./components/filters_bar";
+import EditTools from "./components/edit_tools";
 
 export type Tab = {
   id: number;
@@ -38,6 +40,8 @@ function Index() {
         setActiveTab={setActiveTab}
         closeTab={closeTab}
       />
+      <FiltersBar />
+      <EditTools />
 
       <Canvas
         setOpenFile={(fn) => (openFileRef.current = fn)}

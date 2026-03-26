@@ -1,0 +1,35 @@
+.filters_bar {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+
+  right: 16px;
+  top: 104px;
+  height: calc(100% - 32px - 104px);
+  min-width: 317px;
+
+  gap: 16px;
+  padding: 10px;
+  box-sizing: border-box;
+  backdrop-filter: blur(20px);
+
+  padding: 16px;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  .filters_title {
+    font-family: var(--font-family);
+    color: var(--neutral00);
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  .line_divider {
+    height: 1px;
+    width: 100%;
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
