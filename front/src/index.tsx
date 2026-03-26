@@ -16,6 +16,7 @@ function Index() {
   const openFileRef = useRef<() => void>(() => {});
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [activeTab, setActiveTab] = useState<number | null>(null);
+  const [zoom, setZoom] = useState(100);
 
   const addTab = (tab: Tab) => {
     setTabs((prev) => [...prev, tab]);
@@ -41,12 +42,13 @@ function Index() {
         closeTab={closeTab}
       />
       <FiltersBar />
-      <EditTools />
+      <EditTools zoom={zoom} setZoom={setZoom} />
 
       <Canvas
         setOpenFile={(fn) => (openFileRef.current = fn)}
         addTab={addTab}
         activeTab={tabs.find((t) => t.id === activeTab)}
+        zoom={zoom}
       />
     </div>
   );

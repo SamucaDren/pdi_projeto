@@ -1,0 +1,27 @@
+.slider_zoom_container {
+  position: relative;
+  height: 200px;
+  width: 10px;
+  background-color: var(--neutral09);
+  border-radius: 10px;
+}
+
+.slider_thumb {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 20px;
+  width: 20px;
+  background-color: var(--red);
+  border-radius: 50%;
+  cursor: grab;
+
+  box-shadow: 0px 0px 0px 0px rgba(233, 75, 75, 0.2);
+  transition: all 0.2s ease;
+
+  &:hover,
+  &:active {
+    background-color: var(--light02);
+    box-shadow: 0px 0px 0px 10px rgba(233, 75, 75, 0.2);
+  }
+}

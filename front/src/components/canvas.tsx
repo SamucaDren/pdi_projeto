@@ -7,12 +7,14 @@ type CanvasProps = {
   setOpenFile: (fn: () => void) => void;
   addTab: (tab: Tab) => void;
   activeTab: Tab | undefined;
+  zoom: number;
 };
 
 export default function Canvas({
   setOpenFile,
   addTab,
   activeTab,
+  zoom, // 🔥 faltava isso
 }: CanvasProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
@@ -114,6 +116,8 @@ export default function Canvas({
         width={stageSize.width}
         height={stageSize.height}
         draggable
+        scaleX={zoom / 100}
+        scaleY={zoom / 100}
         style={{ border: "1px solid #ccc" }}
       >
         {/* GRID */}
