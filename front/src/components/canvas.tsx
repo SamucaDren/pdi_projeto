@@ -70,7 +70,7 @@ export default function Canvas({
             y={y}
             width={2}
             height={2}
-            fill="#1D1D1E"
+            fill="#363639"
           />,
         );
       }
