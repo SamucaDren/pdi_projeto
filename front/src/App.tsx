@@ -17,7 +17,7 @@ function App() {
     formData.append("file", imagem);
     formData.append("valor_sub", String(valor));
 
-    const res = await fetch("http://127.0.0.1:8000/teste_de_api", {
+    const res = await fetch("http://localhost:8000/teste_de_api", {
       method: "POST",
       body: formData,
     });

@@ -1,0 +1,46 @@
+.nav_bar_container {
+  position: absolute;
+  height: fit-content;
+  width: calc(100vw - 32px);
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: row;
+
+  justify-content: space-between;
+  backdrop-filter: blur(20px);
+
+  padding: 16px;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 10;
+  margin: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nav_bar_logo {
+  font-family: var(--font-family);
+  color: var(--neutral00);
+  font-size: 24px;
+  font-weight: 600;
+  span {
+    color: var(--red);
+    text-transform: uppercase;
+  }
+}
+
+.open_file_button {
+  font-family: var(--font-family);
+  font-size: 16px;
+  color: var(--neutral00);
+  background-color: transparent;
+  border: 2px solid var(--red);
+  border-radius: 40px;
+  padding: 8px 24px;
+}
+
+.nav_bar_content {
+  display: flex;
+  flex-direction: row;
+  gap: 40px;
+}
