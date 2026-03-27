@@ -51,3 +51,19 @@ h1 {
   width: 100vw;
   height: 100vh;
 }
+
+.button_red {
+  background-color: var(--red);
+  color: var(--neutral00);
+  border: none;
+  border-radius: 40px;
+  padding: 10px 16px;
+  height: fit-content;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: var(--light01);
+  }
+}

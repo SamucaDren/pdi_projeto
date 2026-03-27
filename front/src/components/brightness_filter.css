@@ -1,0 +1,12 @@
+.brightness_filter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.container_brightness_filter {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}

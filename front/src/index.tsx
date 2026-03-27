@@ -4,16 +4,11 @@ import Canvas from "./components/canvas";
 import FiltersBar from "./components/filters_bar";
 import EditTools from "./components/edit_tools";
 
-export type Tab = {
-  id: number;
-  image: HTMLImageElement;
-  name: string;
-  width: number;
-  height: number;
-};
+import type { Tab, Filter } from "./types";
 
 function Index() {
   const openFileRef = useRef<() => void>(() => {});
+  const [filter, setFilter] = useState<Filter | null>(null);
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [zoom, setZoom] = useState(100);
@@ -41,8 +36,13 @@ function Index() {
         setActiveTab={setActiveTab}
         closeTab={closeTab}
       />
-      <FiltersBar />
-      <EditTools zoom={zoom} setZoom={setZoom} />
+      <FiltersBar activeFilter={filter} />
+      <EditTools
+        zoom={zoom}
+        setZoom={setZoom}
+        activeFilter={filter}
+        setActiveFilter={setFilter}
+      />
 
       <Canvas
         setOpenFile={(fn) => (openFileRef.current = fn)}

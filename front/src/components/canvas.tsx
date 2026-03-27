@@ -14,7 +14,7 @@ export default function Canvas({
   setOpenFile,
   addTab,
   activeTab,
-  zoom, // 🔥 faltava isso
+  zoom,
 }: CanvasProps) {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 

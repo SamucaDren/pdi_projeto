@@ -47,6 +47,7 @@ function SliderZoom({ zoom, setZoom }: SliderProps) {
         style={{ top }}
         onMouseDown={handleMouseDown}
       />
+      <span className="slider_label">{zoom}%</span>
     </div>
   );
 }
