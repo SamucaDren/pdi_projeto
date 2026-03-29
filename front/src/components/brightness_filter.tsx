@@ -3,9 +3,13 @@ import Slider from "./Slider";
 import "./brightness_filter.css";
 import type { Tab } from "../types";
 
+//FUNÇÃO QUE APLICA O FILTRO DE BRILHO CHAMANDO A API
 async function ApplyBrightnessFilter(
   brightness: number,
   activeTab: Tab | undefined,
+  //  onApply: (tab: Tab) => void,
+
+  onApply: (tab: string) => void,
 ) {
   if (!activeTab) return;
 
@@ -20,14 +24,17 @@ async function ApplyBrightnessFilter(
 
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
-  console.log(url);
+  activeTab.previewUrl = url;
+  activeTab.filters.push({ filter: "brilho", valor: brightness });
+  onApply(url);
 }
 
 type BrightnessFilterProps = {
   activeTab?: Tab;
+  onApply: (url: string) => void;
 };
 
-function BrightnessFilter({ activeTab }: BrightnessFilterProps) {
+function BrightnessFilter({ activeTab, onApply }: BrightnessFilterProps) {
   const [brightness, setBrightness] = useState(0);
 
   return (
@@ -45,7 +52,7 @@ function BrightnessFilter({ activeTab }: BrightnessFilterProps) {
       </div>
       <button
         className="apply_button button_red"
-        onClick={() => ApplyBrightnessFilter(brightness, activeTab)}
+        onClick={() => ApplyBrightnessFilter(brightness, activeTab, onApply)}
       >
         Aplicar Filtro
       </button>

@@ -25,7 +25,6 @@ export default function Canvas({
 
   const [imageObj, setImageObj] = useState<HTMLImageElement | null>(null);
 
-  // 🔹 carregar imagem pro Konva
   useEffect(() => {
     if (!activeTab) return;
 
@@ -37,7 +36,6 @@ export default function Canvas({
     };
   }, [activeTab]);
 
-  // 🔹 expõe função pro Nav
   useEffect(() => {
     const open = () => {
       fileInputRef.current?.click();
@@ -46,7 +44,6 @@ export default function Canvas({
     setOpenFile(open);
   }, [setOpenFile]);
 
-  // 🔹 resize
   useEffect(() => {
     const handleResize = () => {
       setStageSize({
@@ -59,7 +56,6 @@ export default function Canvas({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // 🔹 atalho teclado
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "o") {
@@ -72,7 +68,6 @@ export default function Canvas({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // 🔹 grid
   const renderDots = () => {
     const dots = [];
     const spacing = 40;
@@ -95,7 +90,6 @@ export default function Canvas({
     return dots;
   };
 
-  // 🔹 carregar imagem → cria aba
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -121,6 +115,7 @@ export default function Canvas({
         previewUrl,
         width,
         height,
+        filters: [],
       });
     };
 

@@ -13,6 +13,14 @@ function Index() {
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [zoom, setZoom] = useState(100);
 
+  const handleFilteredImage = (url: string) => {
+    setTabs((prev) =>
+      prev.map((tab) =>
+        tab.id === activeTab ? { ...tab, previewUrl: url } : tab,
+      ),
+    );
+  };
+
   const addTab = (tab: Tab) => {
     setTabs((prev) => [...prev, tab]);
     setActiveTab(tab.id);
@@ -36,7 +44,11 @@ function Index() {
         setActiveTab={setActiveTab}
         closeTab={closeTab}
       />
-      <FiltersBar activeFilter={filter} />
+      <FiltersBar
+        activeFilter={filter}
+        activeTab={tabs.find((t) => t.id === activeTab)}
+        onApply={handleFilteredImage}
+      />
       <EditTools
         zoom={zoom}
         setZoom={setZoom}
