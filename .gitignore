@@ -1,2 +1,2 @@
-back/_pycache_/*
-back/__pycache__/main.cpython-313.pyc
+__pycache__/
+*.pyc

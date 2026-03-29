@@ -1,6 +1,4 @@
 import { useState } from "react";
-import "./App.css";
-
 function App() {
   const [resultado, setResultado] = useState<string | null>(null);
   const [imagem, setImagem] = useState<File | null>(null);
@@ -38,7 +36,7 @@ function App() {
           if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             setImagem(file);
-            setPreview(URL.createObjectURL(file)); // 👈 preview original
+            setPreview(URL.createObjectURL(file));
           }
         }}
       />
