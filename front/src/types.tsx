@@ -1,6 +1,7 @@
 export type Tab = {
   id: number;
-  image: HTMLImageElement;
+  file: File;
+  previewUrl: string;
   name: string;
   width: number;
   height: number;

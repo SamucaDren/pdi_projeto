@@ -78,4 +78,6 @@
 
 .option_active {
   background-color: var(--red);
+  stroke: var(--neutral00);
+  fill: var(--neutral00);
 }

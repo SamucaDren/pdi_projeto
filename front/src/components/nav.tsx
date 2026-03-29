@@ -1,6 +1,6 @@
 import React from "react";
 import "./nav.css";
-import type { Tab } from "../index.tsx";
+import type { Tab } from "../types.tsx";
 
 type NavProps = {
   onOpenFile: () => void;

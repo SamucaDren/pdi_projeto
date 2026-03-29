@@ -1,7 +1,7 @@
 import { Stage, Layer, Rect, Image as KonvaImage } from "react-konva";
 import React, { useEffect, useRef, useState } from "react";
 import "./canvas.css";
-import type { Tab } from "../index";
+import type { Tab } from "../types";
 
 type CanvasProps = {
   setOpenFile: (fn: () => void) => void;
@@ -22,6 +22,20 @@ export default function Canvas({
     width: window.innerWidth,
     height: window.innerHeight,
   });
+
+  const [imageObj, setImageObj] = useState<HTMLImageElement | null>(null);
+
+  // 🔹 carregar imagem pro Konva
+  useEffect(() => {
+    if (!activeTab) return;
+
+    const img = new Image();
+    img.src = activeTab.previewUrl;
+
+    img.onload = () => {
+      setImageObj(img);
+    };
+  }, [activeTab]);
 
   // 🔹 expõe função pro Nav
   useEffect(() => {
@@ -86,8 +100,10 @@ export default function Canvas({
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const previewUrl = URL.createObjectURL(file);
+
     const img = new Image();
-    img.src = URL.createObjectURL(file);
+    img.src = previewUrl;
 
     img.onload = () => {
       let width = img.width;
@@ -101,7 +117,8 @@ export default function Canvas({
       addTab({
         id: Date.now(),
         name: file.name,
-        image: img,
+        file: file,
+        previewUrl,
         width,
         height,
       });
@@ -125,9 +142,9 @@ export default function Canvas({
 
         {/* CONTEÚDO */}
         <Layer>
-          {activeTab && (
+          {activeTab && imageObj && (
             <KonvaImage
-              image={activeTab.image}
+              image={imageObj}
               x={(stageSize.width - activeTab.width) / 2}
               y={(stageSize.height - activeTab.height) / 2}
               width={activeTab.width}
