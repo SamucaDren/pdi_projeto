@@ -3,6 +3,7 @@ import "./filters_bar.css";
 import type { Filter } from "../types";
 import BrightnessFilter from "./brightness_filter";
 import type { Tab } from "../types";
+import BlurFilter from "./blur_filter";
 
 type FiltersBarProps = {
   activeFilter: Filter | null;
@@ -18,6 +19,9 @@ function FiltersBar({ activeFilter, activeTab, onApply }: FiltersBarProps) {
 
       {activeFilter === "brilho" && (
         <BrightnessFilter activeTab={activeTab} onApply={onApply} />
+      )}
+      {activeFilter === "desfoque" && (
+        <BlurFilter activeTab={activeTab} onApply={onApply} />
       )}
     </div>
   );

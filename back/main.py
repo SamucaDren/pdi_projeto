@@ -15,14 +15,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/teste_de_api")
+@app.post("/brightness")
 async def teste_de_api(file: UploadFile = File(...), valor_sub: int = Form(...)):
     conteudo = await file.read()
     
     np_img = np.frombuffer(conteudo, np.uint8)
     img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
     
-    resultado = cv2.add(img, -valor_sub)
+    resultado = cv2.add(img, valor_sub)
     
     _, buffer = cv2.imencode(".png", resultado)
 

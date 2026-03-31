@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import Slider from "./Slider";
-import "./brightness_filter.css";
+import "./blur_filter.css";
 import type { Tab } from "../types";
 
-//FUNÇÃO QUE APLICA O FILTRO DE BRILHO CHAMANDO A API
-async function ApplyBrightnessFilter(
+type BlurFilterProps = {
+  activeTab?: Tab;
+  onApply: (url: string) => void;
+};
+
+async function ApplyBlurFilter(
   brightness: number,
   activeTab: Tab | undefined,
   //  onApply: (tab: Tab) => void,
@@ -17,6 +21,7 @@ async function ApplyBrightnessFilter(
   formData.append("file", activeTab.file);
   formData.append("valor_sub", String(brightness));
 
+  //AJUSTAR DEPOIS PARA O ENDPOINT DE DESFOQUE
   const res = await fetch("http://localhost:8000/brightness", {
     method: "POST",
     body: formData,
@@ -29,34 +34,29 @@ async function ApplyBrightnessFilter(
   onApply(url);
 }
 
-type BrightnessFilterProps = {
-  activeTab?: Tab;
-  onApply: (url: string) => void;
-};
-
-function BrightnessFilter({ activeTab, onApply }: BrightnessFilterProps) {
-  const [brightness, setBrightness] = useState(0);
+function BlurFilter({ activeTab, onApply }: BlurFilterProps) {
+  const [blur, setBlur] = useState(0);
 
   return (
-    <div className="container_brightness_filter">
+    <div className="blur-filter_container">
       <div className="brightness_filter">
-        <span className="filter_title">Brilho</span>
+        <span className="filter_title">Desfoque</span>
 
         <Slider
-          value={brightness}
-          setValue={setBrightness}
-          min={-100}
-          max={100}
+          value={blur}
+          setValue={setBlur}
+          min={0}
+          max={10}
           orientation="horizontal"
         />
       </div>
       <button
         className="apply_button button_red"
-        onClick={() => ApplyBrightnessFilter(brightness, activeTab, onApply)}
+        onClick={() => ApplyBlurFilter(blur, activeTab, onApply)}
       >
         Aplicar Filtro
       </button>
     </div>
   );
 }
-export default BrightnessFilter;
+export default BlurFilter;
