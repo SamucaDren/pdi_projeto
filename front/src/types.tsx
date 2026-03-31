@@ -9,6 +9,12 @@ export type Tab = {
 };
 
 export type Filter = "realce" | "desfoque" | "brilho";
+export type Pencil = "pincel" | "borracha" | "retangulo";
+
+export type PencilAply = {
+  pencil: Pencil;
+  valor: number;
+};
 
 export type FilterAply = {
   filter: Filter;
