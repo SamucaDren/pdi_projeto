@@ -18,6 +18,7 @@ type CanvasProps = {
   activeTab: Tab | undefined;
   zoom: number;
   Pencil?: Pencil | null;
+  pencilWeight?: number | null;
 };
 
 type LineType = {
@@ -31,6 +32,7 @@ export default function Canvas({
   activeTab,
   zoom,
   Pencil,
+  pencilWeight = 24,
 }: CanvasProps) {
   const [lines, setLines] = useState<LineType[]>([]);
   const [isDrawing, setIsDrawing] = useState(false);
@@ -234,7 +236,7 @@ export default function Canvas({
                   key={i}
                   points={line.points}
                   stroke="red"
-                  strokeWidth={20}
+                  strokeWidth={pencilWeight ?? 20}
                   tension={0.5}
                   lineCap="round"
                   lineJoin="round"

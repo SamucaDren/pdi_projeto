@@ -8,6 +8,8 @@ type SliderProps = {
   max: number;
   defaultValue?: number;
   orientation?: "vertical" | "horizontal";
+  showNumber?: boolean;
+  inHolding?: (value: boolean) => void;
 };
 
 function Slider({
@@ -16,6 +18,8 @@ function Slider({
   min,
   max,
   orientation = "vertical",
+  showNumber = true,
+  inHolding,
 }: SliderProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -41,8 +45,13 @@ function Slider({
   };
 
   const handleMouseDown = () => {
+    inHolding?.(true); // 🟢 começou segurar
+
     const move = (e: MouseEvent) => handleMove(e);
+
     const up = () => {
+      inHolding?.(false); // 🔴 soltou
+
       window.removeEventListener("mousemove", move);
       window.removeEventListener("mouseup", up);
     };
@@ -69,7 +78,7 @@ function Slider({
         style={positionStyle}
         onMouseDown={handleMouseDown}
       />
-      <span className="slider_label">{value}</span>
+      {showNumber && <span className="slider_label">{value}</span>}
     </div>
   );
 }

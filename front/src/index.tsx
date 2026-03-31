@@ -8,6 +8,7 @@ import PencilBar from "./components/pencil_bar";
 import type { Tab, Filter, Pencil } from "./types";
 
 function Index() {
+  const [pencilWeight, setPencilWeight] = useState(24);
   const openFileRef = useRef<() => void>(() => {});
   const [filter, setFilter] = useState<Filter | null>(null);
   const [pencil, setPencil] = useState<Pencil | null>(null);
@@ -57,13 +58,18 @@ function Index() {
         activeFilter={filter}
         setActiveFilter={setFilter}
       />
-      <PencilBar Pencil={pencil} setPencil={setPencil} />
+      <PencilBar
+        Pencil={pencil}
+        setPencil={setPencil}
+        onPencilWeightChange={setPencilWeight}
+      />
       <Canvas
         setOpenFile={(fn) => (openFileRef.current = fn)}
         addTab={addTab}
         activeTab={tabs.find((t) => t.id === activeTab)}
         zoom={zoom}
         Pencil={pencil}
+        pencilWeight={pencilWeight}
       />
     </div>
   );
