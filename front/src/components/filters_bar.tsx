@@ -1,4 +1,3 @@
-import React from "react";
 import "./filters_bar.css";
 import type { Filter } from "../types";
 import BrightnessFilter from "./brightness_filter";

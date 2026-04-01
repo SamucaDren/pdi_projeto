@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Nav from "./components/nav";
 import Canvas from "./components/canvas";
 import FiltersBar from "./components/filters_bar";

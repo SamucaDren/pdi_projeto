@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import Slider from "./Slider";
 import "./brightness_filter.css";
 import type { Tab } from "../types";

@@ -1,4 +1,3 @@
-import React from "react";
 import "./nav.css";
 import type { Tab } from "../types.tsx";
 

@@ -1,4 +1,3 @@
-import React from "react";
 import "./edit_tools.css";
 import SliderZoom from "./slider_zoom";
 import type { Filter } from "../types";
