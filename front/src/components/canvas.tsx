@@ -35,6 +35,13 @@ export default function Canvas({
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null);
 
   const lastPointRef = useRef<{ x: number; y: number } | null>(null);
+  const startRectRef = useRef<{ x: number; y: number } | null>(null);
+  const [currentRect, setCurrentRect] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const maskRef = useRef<Uint8Array | null>(null);
@@ -46,22 +53,22 @@ export default function Canvas({
 
   const getImageBounds = () => {
     if (!activeTab) return null;
-
     const x = (stageSize.width - activeTab.width) / 2;
     const y = (stageSize.height - activeTab.height) / 2;
-
     return { x, y, width: activeTab.width, height: activeTab.height };
   };
-
   const bounds = getImageBounds();
 
   const getRelativePosition = (stage: Konva.Stage) => {
     const pos = stage.getPointerPosition();
     if (!pos || !bounds) return null;
 
+    // pega escala atual da imagem
+    const scale = zoom / 100;
+
     return {
-      x: (pos.x - bounds.x) / (zoom / 100),
-      y: (pos.y - bounds.y) / (zoom / 100),
+      x: (pos.x - bounds.x) / scale,
+      y: (pos.y - bounds.y) / scale,
     };
   };
 
@@ -128,7 +135,6 @@ export default function Canvas({
     }
   };
 
-  // 🔥 NOVO: traço contínuo
   const paintLine = (
     x0: number,
     y0: number,
@@ -140,7 +146,7 @@ export default function Canvas({
     const dy = y1 - y0;
     const distance = Math.sqrt(dx * dx + dy * dy);
 
-    const step = 1; // quanto menor, mais suave
+    const step = 1;
     const steps = Math.floor(distance / step);
 
     for (let i = 0; i <= steps; i++) {
@@ -161,8 +167,14 @@ export default function Canvas({
     if (!pos || !isInsideImage(pos.x, pos.y)) return;
 
     setIsDrawing(true);
-    lastPointRef.current = pos;
 
+    if (Pencil === "retangulo") {
+      startRectRef.current = pos;
+      setCurrentRect({ x: pos.x, y: pos.y, width: 0, height: 0 });
+      return;
+    }
+
+    lastPointRef.current = pos;
     paintCircle(pos.x, pos.y, Pencil === "borracha");
     updateMaskImage();
   };
@@ -176,6 +188,21 @@ export default function Canvas({
 
     setCursor(pos);
 
+    if (Pencil === "retangulo" && startRectRef.current) {
+      const x0 = startRectRef.current.x;
+      const y0 = startRectRef.current.y;
+      const x1 = pos.x;
+      const y1 = pos.y;
+
+      setCurrentRect({
+        x: Math.min(x0, x1),
+        y: Math.min(y0, y1),
+        width: Math.abs(x1 - x0),
+        height: Math.abs(y1 - y0),
+      });
+      return;
+    }
+
     if (!isDrawing || !lastPointRef.current) return;
     if (!isInsideImage(pos.x, pos.y)) return;
 
@@ -188,11 +215,34 @@ export default function Canvas({
     );
 
     lastPointRef.current = pos;
-
     updateMaskImage();
   };
 
   const handleMouseUp = () => {
+    if (
+      Pencil === "retangulo" &&
+      startRectRef.current &&
+      currentRect &&
+      activeTab
+    ) {
+      const xStart = currentRect.x;
+      const yStart = currentRect.y;
+      const xEnd = xStart + currentRect.width;
+      const yEnd = yStart + currentRect.height;
+
+      for (let x = Math.floor(xStart); x < xEnd; x++) {
+        for (let y = Math.floor(yStart); y < yEnd; y++) {
+          if (x >= 0 && x < activeTab.width && y >= 0 && y < activeTab.height) {
+            const index = y * activeTab.width + x;
+            maskRef.current![index] = 1;
+          }
+        }
+      }
+      updateMaskImage();
+      startRectRef.current = null;
+      setCurrentRect(null);
+    }
+
     setIsDrawing(false);
     lastPointRef.current = null;
   };
@@ -270,7 +320,8 @@ export default function Canvas({
     return dots;
   };
 
-  const isDrawingMode = Pencil === "pincel" || Pencil === "borracha";
+  const isDrawingMode =
+    Pencil === "pincel" || Pencil === "borracha" || Pencil === "retangulo";
 
   return (
     <>
@@ -278,8 +329,6 @@ export default function Canvas({
         width={stageSize.width}
         height={stageSize.height}
         draggable={!isDrawingMode}
-        scaleX={zoom / 100}
-        scaleY={zoom / 100}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
@@ -288,7 +337,13 @@ export default function Canvas({
 
         <Layer>
           {activeTab && imageObj && bounds && (
-            <Group x={bounds.x} y={bounds.y} draggable={!isDrawingMode}>
+            <Group
+              x={bounds.x}
+              y={bounds.y}
+              scaleX={zoom / 100}
+              scaleY={zoom / 100}
+              draggable={!isDrawingMode}
+            >
               <KonvaImage
                 image={imageObj}
                 width={bounds.width}
@@ -305,19 +360,33 @@ export default function Canvas({
             </Group>
           )}
         </Layer>
+        {isDrawingMode && (
+          <Layer>
+            {cursor && activeTab && bounds && Pencil !== "retangulo" && (
+              <Group x={bounds.x} y={bounds.y}>
+                {/* cursor permanece do tamanho real, Stage já escala */}
+                <Circle
+                  x={cursor.x}
+                  y={cursor.y}
+                  radius={pencilWeight ?? 20} // sem divisão pelo zoom
+                  fill="rgba(255,0,0,0.2)"
+                />
+              </Group>
+            )}
 
-        <Layer>
-          {cursor && activeTab && bounds && (
-            <Group x={bounds.x} y={bounds.y}>
-              <Circle
-                x={cursor.x}
-                y={cursor.y}
-                radius={pencilWeight ?? 20}
-                fill="rgba(255,0,0,0.2)"
-              />
-            </Group>
-          )}
-        </Layer>
+            {currentRect && activeTab && bounds && (
+              <Group x={bounds.x} y={bounds.y}>
+                <Rect
+                  x={currentRect.x}
+                  y={currentRect.y}
+                  width={currentRect.width}
+                  height={currentRect.height}
+                  fill="rgba(255,0,0,0.2)"
+                />
+              </Group>
+            )}
+          </Layer>
+        )}
       </Stage>
 
       <input
