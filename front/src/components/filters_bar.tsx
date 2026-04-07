@@ -3,6 +3,7 @@ import type { Filter } from "../types";
 import BrightnessFilter from "./brightness_filter";
 import type { Tab } from "../types";
 import BlurFilter from "./blur_filter";
+import HighFilter from "./high_filter";
 
 type FiltersBarProps = {
   activeFilter: Filter | null;
@@ -21,6 +22,9 @@ function FiltersBar({ activeFilter, activeTab, onApply }: FiltersBarProps) {
       )}
       {activeFilter === "desfoque" && (
         <BlurFilter activeTab={activeTab} onApply={onApply} />
+      )}
+      {activeFilter === "realce" && (
+        <HighFilter activeTab={activeTab} onApply={onApply} />
       )}
     </div>
   );
