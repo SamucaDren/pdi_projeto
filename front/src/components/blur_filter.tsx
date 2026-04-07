@@ -9,20 +9,29 @@ type BlurFilterProps = {
 };
 
 async function ApplyBlurFilter(
-  brightness: number,
-  activeTab: Tab | undefined,
-  //  onApply: (tab: Tab) => void,
-
+  desfoque: number,
+  tipo : string,
+  activeTab: Tab | undefined,  
   onApply: (tab: string) => void,
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) {
   if (!activeTab) return;
 
-  const formData = new FormData();
-  formData.append("file", activeTab.file);
-  formData.append("valor_sub", String(brightness));
+  setLoading(true);
 
-  //AJUSTAR DEPOIS PARA O ENDPOINT DE DESFOQUE
-  const res = await fetch("http://localhost:8000/brightness", {
+  const formData = new FormData();
+  formData.append("imagem", activeTab.file);
+  formData.append("intensidade", String(desfoque));
+
+  let endpoint = "";
+
+  if (tipo === "media") {
+    endpoint = "http://localhost:8000/media";
+  } else if (tipo === "gaussiano") {
+    endpoint = "http://localhost:8000/gaussiano";
+  }
+
+  const res = await fetch(endpoint, {
     method: "POST",
     body: formData,
   });
@@ -30,31 +39,44 @@ async function ApplyBlurFilter(
   const blob = await res.blob();
   const url = URL.createObjectURL(blob);
   activeTab.previewUrl = url;
-  activeTab.filters.push({ filter: "brilho", valor: brightness });
+  activeTab.filters.push({ filter: "desfoque", valor: desfoque });
   onApply(url);
+  setLoading(false);
 }
 
 function BlurFilter({ activeTab, onApply }: BlurFilterProps) {
   const [blur, setBlur] = useState(0);
+  const [tipo, setTipo] = useState("media");
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="blur-filter_container">
       <div className="brightness_filter">
         <span className="filter_title">Desfoque</span>
+        <span className="filter_title">Tipo de Desfoque</span>
+        <select        
+          value={tipo}
+          onChange={(e) => setTipo(e.target.value)}
+        >
+          <option value="media">Média</option>
+          <option value="gaussiano">Gaussiano</option>
+        </select>
+
 
         <Slider
           value={blur}
           setValue={setBlur}
           min={0}
-          max={10}
+          max={30}
           orientation="horizontal"
         />
       </div>
       <button
         className="apply_button button_red"
-        onClick={() => ApplyBlurFilter(blur, activeTab, onApply)}
+        disabled={loading}
+        onClick={() => ApplyBlurFilter(blur, tipo, activeTab, onApply, setLoading)}
       >
-        Aplicar Filtro
+        {loading ? "Processando..." : "Aplicar Filtro"}
       </button>
     </div>
   );

@@ -16,14 +16,47 @@ app.add_middleware(
 )
 
 @app.post("/brightness")
-async def teste_de_api(file: UploadFile = File(...), valor_sub: int = Form(...)):
-    conteudo = await file.read()
+async def brilho(imagem: UploadFile = File(...), intensidade: int = Form(...)):
+    conteudo = await imagem.read()
     
     np_img = np.frombuffer(conteudo, np.uint8)
     img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
     
-    resultado = cv2.add(img, valor_sub)
+    resultado = cv2.add(img, intensidade)
     
     _, buffer = cv2.imencode(".png", resultado)
 
     return StreamingResponse(io.BytesIO(buffer.tobytes()), media_type="image/png")
+
+@app.post("/media")
+async def  desfoque(imagem : UploadFile = File(...), intensidade : int = Form(...)):
+    conteudo = await imagem.read()
+    
+    np_img = np.frombuffer(conteudo, np.uint8)
+    img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+    
+    k = max(1, intensidade)
+
+    resultado = cv2.blur(img, (k, k))
+    
+    _, buffer = cv2.imencode(".png", resultado)
+    
+    return StreamingResponse(io.BytesIO(buffer.tobytes()), media_type="image/png")
+
+@app.post("/gaussiano")
+async def  desfoque(imagem : UploadFile = File(...), intensidade : int = Form(...)):
+    conteudo = await imagem.read()
+    
+    np_img = np.frombuffer(conteudo, np.uint8)
+    img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
+    
+    # kernel precisa ser ímpar
+    k = intensidade if intensidade % 2 == 1 else intensidade + 1
+    k = max(1, k)   
+
+    resultado = cv2.GaussianBlur(img, (k, k), 0)
+    
+    _, buffer = cv2.imencode(".png", resultado)
+    
+    return StreamingResponse(io.BytesIO(buffer.tobytes()), media_type="image/png")
+    

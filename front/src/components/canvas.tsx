@@ -391,6 +391,7 @@ export default function Canvas({
 
       <input
         type="file"
+        placeholder="a"
         ref={fileInputRef}
         onChange={handleFile}
         style={{ display: "none" }}
