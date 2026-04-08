@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useMemo } from "react";
 import Nav from "./components/nav";
 import Canvas from "./components/canvas";
 import FiltersBar from "./components/filters_bar";
@@ -15,20 +15,33 @@ function Index() {
   const [tabs, setTabs] = useState<Tab[]>([]);
   const [activeTab, setActiveTab] = useState<number | null>(null);
   const [zoom, setZoom] = useState(100);
+  const [getMaskFromCanvas, setGetMaskFromCanvas] = useState<
+    (() => boolean[][] | undefined) | null
+  >(null);
 
+  // referência estável da tab ativa
+  const currentTab = useMemo(
+    () => tabs.find((t) => t.id === activeTab) ?? undefined, // muda de null para undefined
+    [tabs, activeTab],
+  );
+
+  // ADICIONA A IMAGEM COM O FILTRO APLICADO DENTRO DO TIPO TAB
   const handleFilteredImage = (url: string) => {
-    setTabs((prev) =>
-      prev.map((tab) =>
-        tab.id === activeTab ? { ...tab, previewUrl: url } : tab,
+    if (!currentTab) return;
+    setTabs((prevTabs) =>
+      prevTabs.map((tab) =>
+        tab.id === currentTab.id ? { ...tab, previewUrl: url } : tab,
       ),
     );
   };
 
+  // RECEBE O OBJETO DA TAB E ADICIONA NA LISTA DE TABS
   const addTab = (tab: Tab) => {
     setTabs((prev) => [...prev, tab]);
     setActiveTab(tab.id);
   };
 
+  // REMOVE A TAB DA LISTA
   const closeTab = (id: number) => {
     const updated = tabs.filter((t) => t.id !== id);
     setTabs(updated);
@@ -36,6 +49,14 @@ function Index() {
     if (activeTab === id) {
       setActiveTab(updated[0]?.id ?? null);
     }
+  };
+
+  const handleUpdateTab = (tabUpdate: Partial<Tab>) => {
+    setTabs((prevTabs) =>
+      prevTabs.map((tab) =>
+        tab.id === tabUpdate.id ? { ...tab, ...tabUpdate } : tab,
+      ),
+    );
   };
 
   return (
@@ -49,8 +70,9 @@ function Index() {
       />
       <FiltersBar
         activeFilter={filter}
-        activeTab={tabs.find((t) => t.id === activeTab)}
+        activeTab={currentTab}
         onApply={handleFilteredImage}
+        getMaskFromCanvas={getMaskFromCanvas} // <-- passa a função aqui
       />
       <EditTools
         zoom={zoom}
@@ -66,10 +88,12 @@ function Index() {
       <Canvas
         setOpenFile={(fn) => (openFileRef.current = fn)}
         addTab={addTab}
-        activeTab={tabs.find((t) => t.id === activeTab)}
+        activeTab={currentTab}
         zoom={zoom}
         Pencil={pencil}
         pencilWeight={pencilWeight}
+        onUpdateTab={handleUpdateTab} // <-- adicionado
+        setGetMask={setGetMaskFromCanvas}
       />
     </div>
   );

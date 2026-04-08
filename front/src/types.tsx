@@ -6,6 +6,8 @@ export type Tab = {
   width: number;
   height: number;
   filters: FilterAply[];
+  maskFilter?: boolean[][];
+  imageObj?: HTMLImageElement;
 };
 
 export type Filter = "realce" | "desfoque" | "brilho";

@@ -1,9 +1,11 @@
 from fastapi import FastAPI, UploadFile, File, Form
-import cv2
-import numpy as np
 from fastapi.responses import StreamingResponse
-import io
 from fastapi.middleware.cors import CORSMiddleware
+import numpy as np
+import cv2
+import io
+from typing import Optional
+import json
 
 app = FastAPI()
 

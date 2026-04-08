@@ -7,7 +7,7 @@ async function ApplyBrightnessFilter(
   brightness: number,
   activeTab: Tab | undefined,
   onApply: (url: string) => void,
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
 ) {
   if (!activeTab) return;
 
@@ -36,9 +36,14 @@ async function ApplyBrightnessFilter(
 type BrightnessFilterProps = {
   activeTab?: Tab;
   onApply: (url: string) => void;
+  getMask?: () => boolean[][] | undefined;
 };
 
-function BrightnessFilter({ activeTab, onApply }: BrightnessFilterProps) {
+function BrightnessFilter({
+  activeTab,
+  onApply,
+  getMask,
+}: BrightnessFilterProps) {
   const [brightness, setBrightness] = useState(0);
   const [loading, setLoading] = useState(false);
   return (
@@ -66,4 +71,5 @@ function BrightnessFilter({ activeTab, onApply }: BrightnessFilterProps) {
     </div>
   );
 }
+
 export default BrightnessFilter;

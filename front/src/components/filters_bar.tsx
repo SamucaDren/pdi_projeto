@@ -9,16 +9,26 @@ type FiltersBarProps = {
   activeFilter: Filter | null;
   activeTab?: Tab;
   onApply: (url: string) => void;
+  getMaskFromCanvas?: (() => boolean[][] | undefined) | null; // novo
 };
 
-function FiltersBar({ activeFilter, activeTab, onApply }: FiltersBarProps) {
+function FiltersBar({
+  activeFilter,
+  activeTab,
+  onApply,
+  getMaskFromCanvas,
+}: FiltersBarProps) {
   return (
     <div className="filters_bar">
       <span className="filters_title">Ajustes</span>
       <div className="line_divider"></div>
 
       {activeFilter === "brilho" && (
-        <BrightnessFilter activeTab={activeTab} onApply={onApply} />
+        <BrightnessFilter
+          activeTab={activeTab}
+          onApply={onApply}
+          getMask={getMaskFromCanvas ?? undefined} // <-- aqui
+        />
       )}
       {activeFilter === "desfoque" && (
         <BlurFilter activeTab={activeTab} onApply={onApply} />
