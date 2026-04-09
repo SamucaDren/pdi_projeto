@@ -11,6 +11,7 @@ export type Tab = {
 };
 
 export type Filter = "realce" | "desfoque" | "brilho";
+export type TypeOfBlur = "gaussiano" | "media";
 export type Pencil = "pincel" | "borracha" | "retangulo";
 
 export type PencilAply = {
@@ -21,4 +22,5 @@ export type PencilAply = {
 export type FilterAply = {
   filter: Filter;
   valor: number;
+  type?: TypeOfBlur;
 };

@@ -1,5 +1,5 @@
 import "./filters_bar.css";
-import type { Filter } from "../types";
+import type { Filter, FilterAply } from "../types";
 import BrightnessFilter from "./brightness_filter";
 import type { Tab } from "../types";
 import BlurFilter from "./blur_filter";
@@ -9,6 +9,7 @@ type FiltersBarProps = {
   activeFilter: Filter | null;
   activeTab?: Tab;
   onApply: (url: string) => void;
+  filter: (filter: FilterAply) => void;
   getMaskFromCanvas?: (() => boolean[][] | undefined) | null; // novo
 };
 
@@ -17,6 +18,7 @@ function FiltersBar({
   activeTab,
   onApply,
   getMaskFromCanvas,
+  filter,
 }: FiltersBarProps) {
   return (
     <div className="filters_bar">
@@ -26,7 +28,8 @@ function FiltersBar({
       {activeFilter === "brilho" && (
         <BrightnessFilter
           activeTab={activeTab}
-          onApply={onApply}
+          //          onApply={onApply, }
+          filterAply={filter}
           getMask={getMaskFromCanvas ?? undefined} // <-- aqui
         />
       )}

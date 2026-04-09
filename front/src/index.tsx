@@ -4,8 +4,9 @@ import Canvas from "./components/canvas";
 import FiltersBar from "./components/filters_bar";
 import EditTools from "./components/edit_tools";
 import PencilBar from "./components/pencil_bar";
+import { ApplyFilter } from "./services/applyFilter";
 
-import type { Tab, Filter, Pencil } from "./types";
+import type { Tab, Filter, Pencil, FilterAply } from "./types";
 
 function Index() {
   const [pencilWeight, setPencilWeight] = useState(24);
@@ -32,6 +33,21 @@ function Index() {
       prevTabs.map((tab) =>
         tab.id === currentTab.id ? { ...tab, previewUrl: url } : tab,
       ),
+    );
+  };
+
+  const handleAplyFilter = async (filter: FilterAply) => {
+    if (!currentTab) return;
+
+    const updatedTab = await ApplyFilter({
+      tab: currentTab,
+      filter,
+    });
+
+    if (!updatedTab) return;
+
+    setTabs((prevTabs) =>
+      prevTabs.map((tab) => (tab.id === currentTab.id ? updatedTab : tab)),
     );
   };
 
@@ -71,6 +87,7 @@ function Index() {
       <FiltersBar
         activeFilter={filter}
         activeTab={currentTab}
+        filter={handleAplyFilter}
         onApply={handleFilteredImage}
         getMaskFromCanvas={getMaskFromCanvas} // <-- passa a função aqui
       />
