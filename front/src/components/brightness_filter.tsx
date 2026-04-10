@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Slider from "./Slider";
 import "./brightness_filter.css";
-import type { Tab, FilterAply } from "../types";
+import type { FilterAply } from "../types";
 
 /*
 async function ApplyBrightnessFilter(
@@ -38,7 +38,7 @@ async function ApplyBrightnessFilter(
 //function ApplyBightnessFilter01(brightness: number) {console.log(brightness)}
 
 type BrightnessFilterProps = {
-  activeTab?: Tab;
+  //activeTab?: Tab;
   // onApply: (url: string) => void;
   getMask?: () => boolean[][] | undefined;
   filterAply: (filter: FilterAply) => void;
@@ -75,6 +75,7 @@ function BrightnessFilter({
         }
       >
         {/*loading ? "Processando..." : "Aplicar Filtro"*/}
+        Aplicar Filtro
       </button>
     </div>
   );

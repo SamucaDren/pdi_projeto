@@ -1,13 +1,15 @@
 import { useState } from "react";
 import Slider from "./Slider";
 import "./blur_filter.css";
-import type { Tab } from "../types";
+import type { FilterAply, TypeOfHigh } from "../types";
 
 type HighFilterProps = {
-  activeTab?: Tab;
-  onApply: (url: string) => void;
+  // activeTab?: Tab;
+  //onApply: (url: string) => void;
+  filterAply: (filter: FilterAply) => void;
 };
 
+/*
 async function ApplyHighFilter(
   realce: number,
   tipo : string,
@@ -42,26 +44,26 @@ async function ApplyHighFilter(
   activeTab.filters.push({ filter: "realce", valor: realce });
   onApply(url);
   setLoading(false);
-}
+}*/
 
-function HighFilter({ activeTab, onApply }: HighFilterProps) {
+function HighFilter({
+  //activeTab,
+  filterAply,
+  //  onApply
+}: HighFilterProps) {
   const [blur, setBlur] = useState(0);
   const [tipo, setTipo] = useState("sobel");
-  const [loading, setLoading] = useState(false);
+  //const [loading, setLoading] = useState(false);
 
   return (
     <div className="blur-filter_container">
       <div className="brightness_filter">
         <span className="filter_title">Desfoque</span>
         <span className="filter_title">Tipo de Desfoque</span>
-        <select        
-          value={tipo}
-          onChange={(e) => setTipo(e.target.value)}
-        >
+        <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
           <option value="sobel">Sobel</option>
           <option value="laplaciano">Laplaciano</option>
         </select>
-
 
         <Slider
           value={blur}
@@ -73,10 +75,19 @@ function HighFilter({ activeTab, onApply }: HighFilterProps) {
       </div>
       <button
         className="apply_button button_red"
-        disabled={loading}
-        onClick={() => ApplyHighFilter(blur, tipo, activeTab, onApply, setLoading)}
+        //disabled={loading}
+        onClick={() =>
+          // {ApplyHighFilter(blur, tipo, activeTab, onApply, setLoading)}
+
+          filterAply({
+            filter: "realce",
+            valor: blur,
+            type: tipo as TypeOfHigh,
+          })
+        }
       >
-        {loading ? "Processando..." : "Aplicar Filtro"}
+        {/*loading ? "Processando..." : "Aplicar Filtro"*/}
+        Aplicar Filtro
       </button>
     </div>
   );

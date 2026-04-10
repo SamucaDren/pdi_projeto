@@ -8,16 +8,16 @@ import HighFilter from "./high_filter";
 type FiltersBarProps = {
   activeFilter: Filter | null;
   activeTab?: Tab;
-  onApply: (url: string) => void;
+  onApply?: (url: string) => void;
   filter: (filter: FilterAply) => void;
   getMaskFromCanvas?: (() => boolean[][] | undefined) | null; // novo
 };
 
 function FiltersBar({
   activeFilter,
-  activeTab,
-  onApply,
-  getMaskFromCanvas,
+  //activeTab,
+  //onApply,
+  // getMaskFromCanvas,
   filter,
 }: FiltersBarProps) {
   return (
@@ -25,20 +25,9 @@ function FiltersBar({
       <span className="filters_title">Ajustes</span>
       <div className="line_divider"></div>
 
-      {activeFilter === "brilho" && (
-        <BrightnessFilter
-          activeTab={activeTab}
-          //          onApply={onApply, }
-          filterAply={filter}
-          getMask={getMaskFromCanvas ?? undefined} // <-- aqui
-        />
-      )}
-      {activeFilter === "desfoque" && (
-        <BlurFilter activeTab={activeTab} onApply={onApply} />
-      )}
-      {activeFilter === "realce" && (
-        <HighFilter activeTab={activeTab} onApply={onApply} />
-      )}
+      {activeFilter === "brilho" && <BrightnessFilter filterAply={filter} />}
+      {activeFilter === "desfoque" && <BlurFilter filterAply={filter} />}
+      {activeFilter === "realce" && <HighFilter filterAply={filter} />}
     </div>
   );
 }

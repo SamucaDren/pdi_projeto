@@ -57,8 +57,14 @@ async def nitidez_sobel(imagem: UploadFile = File(...), intensidade: int = Form(
     
     cinza = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     
-    k = intensidade if intensidade % 2 == 1 else intensidade + 1
-    k = max(1, k)
+    k = int(intensidade)
+
+    # garantir ímpar
+    if k % 2 == 0:
+        k += 1
+
+    # limitar entre 1 e 31
+    k = max(1, min(k, 31))
 
     sobel_x = cv2.Sobel(cinza, cv2.CV_64F, 1, 0, ksize=k)
     sobel_y = cv2.Sobel(cinza, cv2.CV_64F, 0, 1, ksize=k)
@@ -72,15 +78,20 @@ async def nitidez_sobel(imagem: UploadFile = File(...), intensidade: int = Form(
     _, buffer = cv2.imencode(".png", resultado)
     return StreamingResponse(io.BytesIO(buffer.tobytes()), media_type="image/png")
 
-
 @app.post("/laplaciano")
 async def nitidez_laplaciano(imagem: UploadFile = File(...), intensidade: int = Form(...)):
     img = await converter_imagem(imagem)
 
     cinza = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-    k = intensidade if intensidade % 2 == 1 else intensidade + 1
-    k = max(1, k)
+    k = int(intensidade)
+
+    # garantir ímpar
+    if k % 2 == 0:
+        k += 1
+
+    # limitar entre 1 e 31
+    k = max(1, min(k, 31))
 
     laplaciano = cv2.Laplacian(cinza, cv2.CV_64F, ksize=k)
     laplaciano = cv2.convertScaleAbs(laplaciano)
@@ -90,7 +101,6 @@ async def nitidez_laplaciano(imagem: UploadFile = File(...), intensidade: int = 
 
     _, buffer = cv2.imencode(".png", resultado)
     return StreamingResponse(io.BytesIO(buffer.tobytes()), media_type="image/png")
-
 
 # ------------------ FUNÇÃO AUXILIAR ------------------
 

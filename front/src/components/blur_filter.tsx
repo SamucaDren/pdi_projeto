@@ -1,19 +1,22 @@
 import { useState } from "react";
 import Slider from "./Slider";
 import "./blur_filter.css";
-import type { Tab } from "../types";
+import type { FilterAply } from "../types";
 
 type BlurFilterProps = {
-  activeTab?: Tab;
-  onApply: (url: string) => void;
+  // activeTab?: Tab;
+  // onApply: (url: string) => void;
+
+  filterAply: (filter: FilterAply) => void;
 };
 
+/*
 async function ApplyBlurFilter(
   desfoque: number,
-  tipo : string,
-  activeTab: Tab | undefined,  
+  tipo: string,
+  activeTab: Tab | undefined,
   onApply: (tab: string) => void,
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
 ) {
   if (!activeTab) return;
 
@@ -42,26 +45,26 @@ async function ApplyBlurFilter(
   activeTab.filters.push({ filter: "desfoque", valor: desfoque });
   onApply(url);
   setLoading(false);
-}
+}*/
 
-function BlurFilter({ activeTab, onApply }: BlurFilterProps) {
+function BlurFilter({
+  //activeTab,
+  filterAply,
+  //  onApply
+}: BlurFilterProps) {
   const [blur, setBlur] = useState(0);
   const [tipo, setTipo] = useState("media");
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   return (
     <div className="blur-filter_container">
       <div className="brightness_filter">
         <span className="filter_title">Desfoque</span>
         <span className="filter_title">Tipo de Desfoque</span>
-        <select        
-          value={tipo}
-          onChange={(e) => setTipo(e.target.value)}
-        >
+        <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
           <option value="media">Média</option>
           <option value="gaussiano">Gaussiano</option>
         </select>
-
 
         <Slider
           value={blur}
@@ -73,10 +76,22 @@ function BlurFilter({ activeTab, onApply }: BlurFilterProps) {
       </div>
       <button
         className="apply_button button_red"
-        disabled={loading}
-        onClick={() => ApplyBlurFilter(blur, tipo, activeTab, onApply, setLoading)}
+        //disabled={loading}
+        onClick={() =>
+          filterAply({
+            filter: "desfoque",
+            valor: blur,
+            type:
+              tipo === "gaussiano"
+                ? "gaussiano"
+                : tipo === "media"
+                  ? "media"
+                  : undefined,
+          })
+        }
       >
-        {loading ? "Processando..." : "Aplicar Filtro"}
+        {/*loading ? "Processando..." : "Aplicar Filtro"*/}
+        Aplicar Filtro
       </button>
     </div>
   );
