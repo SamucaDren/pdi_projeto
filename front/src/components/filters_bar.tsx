@@ -1,16 +1,19 @@
 import "./filters_bar.css";
-import type { Filter, FilterAply } from "../types";
+import type {
+  //Tab,
+  Filter,
+  FilterAply,
+} from "../types";
 import BrightnessFilter from "./brightness_filter";
-import type { Tab } from "../types";
 import BlurFilter from "./blur_filter";
 import HighFilter from "./high_filter";
 
 type FiltersBarProps = {
   activeFilter: Filter | null;
-  activeTab?: Tab;
-  onApply?: (url: string) => void;
+  //activeTab?: Tab;
+  // onApply?: (url: string) => void;
   filter: (filter: FilterAply) => void;
-  getMaskFromCanvas?: (() => boolean[][] | undefined) | null; // novo
+  // getMaskFromCanvas?: (() => boolean[][] | undefined) | null; // novo
 };
 
 function FiltersBar({

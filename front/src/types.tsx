@@ -16,7 +16,7 @@ export type TypeOfHigh = "sobel" | "laplaciano";
 export type Pencil = "pincel" | "borracha" | "retangulo";
 
 export type PencilAply = {
-  pencil: Pencil;
+  pencil: Pencil | null;
   valor: number;
 };
 
