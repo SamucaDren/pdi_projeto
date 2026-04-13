@@ -60,12 +60,18 @@ function BlurFilter({
     <div className="blur-filter_container">
       <div className="brightness_filter">
         <span className="filter_title">Desfoque</span>
-        <span className="filter_title">Tipo de Desfoque</span>
-        <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
+        <span className="line"></span>
+        <span className="filter_subtitle">Tipo de Desfoque</span>
+        <select
+          className="selectType"
+          value={tipo}
+          onChange={(e) => setTipo(e.target.value)}
+        >
           <option value="media">Média</option>
           <option value="gaussiano">Gaussiano</option>
         </select>
 
+        <span className="filter_subtitle">Peso:</span>
         <Slider
           value={blur}
           setValue={setBlur}

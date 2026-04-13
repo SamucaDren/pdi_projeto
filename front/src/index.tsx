@@ -6,7 +6,12 @@ import Canvas02 from "./components/canvas02";
 import FiltersBar from "./components/filters_bar";
 import EditTools from "./components/edit_tools";
 import PencilBar from "./components/pencil_bar";
-import { ApplyFilter, SelectMaskObjects } from "./services/applyFilter";
+import {
+  ApplyFilter,
+  SelectMaskObjects,
+  undo,
+  redo,
+} from "./services/applyFilter";
 
 import type { Tab, Filter, PencilAply, FilterAply } from "./types";
 
@@ -56,6 +61,8 @@ function Index() {
         height: img.height,
         filters: [],
         imageObj: img,
+        historic: [url],
+        indexHistoric: 0,
       };
 
       addTab(newTab);
@@ -117,6 +124,28 @@ function Index() {
     );
   };
 
+  const handleUndo = () => {
+    if (!currentTab) return;
+
+    const updatedTab = undo(currentTab);
+
+    if (!updatedTab) return;
+    setTabs((prevTabs) =>
+      prevTabs.map((tab) => (tab.id === currentTab.id ? updatedTab : tab)),
+    );
+  };
+
+  const handleRedo = () => {
+    if (!currentTab) return;
+
+    const updatedTab = redo(currentTab);
+
+    if (!updatedTab) return;
+    setTabs((prevTabs) =>
+      prevTabs.map((tab) => (tab.id === currentTab.id ? updatedTab : tab)),
+    );
+  };
+
   const handleselectObjectsClick = async () => {
     if (!currentTab) return;
 
@@ -137,6 +166,8 @@ function Index() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         closeTab={closeTab}
+        undo={handleUndo}
+        redo={handleRedo}
       />
       <FiltersBar
         activeFilter={filter}

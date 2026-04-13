@@ -1,7 +1,7 @@
 .brightness_filter {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
 }
 
 .blur-filter_container {
@@ -9,4 +9,29 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
+}
+
+.filter_title {
+  font-size: 20px;
+}
+
+.filter_subtitle {
+  font-size: 16px;
+  color: var(--neutral02);
+}
+
+.line {
+  width: 100%;
+  height: 2px;
+  background-color: var(--neutral09);
+}
+
+.selectType {
+  background-color: var(--neutral09);
+  color: var(--neutral01);
+  outline: none;
+  border: none;
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
 }

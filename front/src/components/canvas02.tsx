@@ -29,6 +29,13 @@ function Canvas02({
 
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null);
 
+  const [rectPreview, setRectPreview] = useState<{
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  } | null>(null);
+
   const maskRef = useRef<Uint8Array | null>(null);
   const stageRef = useRef<Konva.Stage>(null);
 
@@ -45,9 +52,6 @@ function Canvas02({
     height: number;
   } | null>(null);
 
-  // =========================
-  // MODE
-  // =========================
   const isBrush =
     activePencil?.pencil === "pincel" || activePencil?.pencil === "borracha";
 
@@ -55,9 +59,6 @@ function Canvas02({
 
   const isInteractionMode = isBrush || isRect;
 
-  // =========================
-  // MASK RENDER
-  // =========================
   const drawMask = useCallback(() => {
     if (!activeTab || !maskRef.current) return;
 
@@ -81,9 +82,6 @@ function Canvas02({
     setMaskCanvas(canvas);
   }, [activeTab]);
 
-  // =========================
-  // LOAD IMAGE
-  // =========================
   useEffect(() => {
     if (!activeTab?.previewUrl) return;
 
@@ -118,9 +116,6 @@ function Canvas02({
     };
   }, [activeTab, drawMask]);
 
-  // =========================
-  // POSITION
-  // =========================
   const getPos = () => {
     const stage = stageRef.current;
     if (!stage || !bounds || !activeTab) return null;
@@ -136,9 +131,6 @@ function Canvas02({
     };
   };
 
-  // =========================
-  // BRUSH
-  // =========================
   const paintCircle = (cx: number, cy: number, erase = false) => {
     if (!activeTab || !maskRef.current) return;
 
@@ -181,9 +173,6 @@ function Canvas02({
     }
   };
 
-  // =========================
-  // RECT MASK PAINT
-  // =========================
   const paintRect = (
     x0: number,
     y0: number,
@@ -208,25 +197,18 @@ function Canvas02({
     }
   };
 
-  // =========================
-  // EVENTS
-  // =========================
   const handleMouseDown = () => {
     const pos = getPos();
     if (!pos) return;
 
-    // BRUSH
     if (isBrush) {
       setIsDrawing(true);
-
       paintCircle(pos.x, pos.y, activePencil?.pencil === "borracha");
       drawMask();
-
       lastPointRef.current = pos;
       return;
     }
 
-    // RECT MASK
     if (isRect) {
       setIsRectDrawing(true);
       startRectRef.current = pos;
@@ -240,25 +222,19 @@ function Canvas02({
 
     setCursor(pos);
 
-    // RECT MASK LIVE DRAW
     if (isRectDrawing && startRectRef.current) {
       const start = startRectRef.current;
 
-      paintRect(
-        start.x,
-        start.y,
-        pos.x,
-        pos.y,
-        activePencil?.pencil === "borracha",
-      );
+      setRectPreview({
+        x: Math.min(start.x, pos.x),
+        y: Math.min(start.y, pos.y),
+        width: Math.abs(pos.x - start.x),
+        height: Math.abs(pos.y - start.y),
+      });
 
-      drawMask();
-
-      startRectRef.current = pos;
       return;
     }
 
-    // BRUSH
     if (!isDrawing || !lastPointRef.current) return;
 
     paintLine(
@@ -274,6 +250,23 @@ function Canvas02({
   };
 
   const handleMouseUp = () => {
+    const pos = getPos();
+
+    if (isRectDrawing && startRectRef.current && pos) {
+      const start = startRectRef.current;
+
+      paintRect(
+        start.x,
+        start.y,
+        pos.x,
+        pos.y,
+        activePencil?.pencil === "borracha",
+      );
+
+      drawMask();
+    }
+
+    setRectPreview(null);
     setIsDrawing(false);
     setIsRectDrawing(false);
     lastPointRef.current = null;
@@ -294,9 +287,6 @@ function Canvas02({
     onMaskChange?.(mask);
   };
 
-  // =========================
-  // RENDER
-  // =========================
   return (
     <Stage
       ref={stageRef}
@@ -329,6 +319,20 @@ function Canvas02({
           </Group>
         )}
       </Layer>
+
+      {rectPreview && bounds && activeTab && (
+        <Layer listening={false}>
+          <Rect
+            x={bounds.x + rectPreview.x * (bounds.width / activeTab.width)}
+            y={bounds.y + rectPreview.y * (bounds.height / activeTab.height)}
+            width={rectPreview.width * (bounds.width / activeTab.width)}
+            height={rectPreview.height * (bounds.height / activeTab.height)}
+            stroke="white"
+            dash={[6, 4]}
+            strokeWidth={2}
+          />
+        </Layer>
+      )}
 
       {cursor && isBrush && bounds && activeTab && (
         <Layer listening={false}>

@@ -1,5 +1,3 @@
-// FRONTEND - ApplyFilter + máscara convertida para PNG
-
 import type { Tab, FilterAply, TypeOfBlur } from "../types";
 
 // ---------------- CONVERSOR BOOLEAN[][] -> PNG ----------------
@@ -33,13 +31,38 @@ function maskToPngFile(mask: boolean[][]): Promise<File> {
     canvas.toBlob((blob) => {
       if (!blob) return;
 
-      resolve(
-        new File([blob], "mask.png", {
-          type: "image/png",
-        }),
-      );
+      resolve(new File([blob], "mask.png", { type: "image/png" }));
     }, "image/png");
   });
+}
+
+// ---------------- CONVERTER URL -> BLOB ----------------
+
+async function urlToBlob(url: string): Promise<Blob> {
+  const res = await fetch(url);
+  return await res.blob();
+}
+
+// ---------------- HISTÓRICO ----------------
+
+function updateHistory(tab: Tab, newUrl: string): Tab {
+  let historic = tab.historic ?? [tab.previewUrl];
+  let index =
+    tab.indexHistoric !== undefined ? tab.indexHistoric : historic.length - 1;
+
+  if (index < historic.length - 1) {
+    historic = historic.slice(0, index + 1);
+  }
+
+  historic = [...historic, newUrl];
+  index = historic.length - 1;
+
+  return {
+    ...tab,
+    previewUrl: newUrl,
+    historic,
+    indexHistoric: index,
+  };
 }
 
 // ---------------- ENTRYPOINT ----------------
@@ -76,7 +99,9 @@ async function ApplyBrightnessFilter(
 ): Promise<Tab> {
   const formData = new FormData();
 
-  formData.append("imagem", activeTab.file);
+  const blob = await urlToBlob(activeTab.previewUrl);
+  formData.append("imagem", blob, "image.png");
+
   formData.append("intensidade", String(brightness));
 
   if (activeTab.maskFilter) {
@@ -91,12 +116,13 @@ async function ApplyBrightnessFilter(
 
   if (!res.ok) throw new Error("Erro no endpoint /brightness");
 
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
+  const resultBlob = await res.blob();
+  const url = URL.createObjectURL(resultBlob);
+
+  const updated = updateHistory(activeTab, url);
 
   return {
-    ...activeTab,
-    previewUrl: url,
+    ...updated,
     filters: [...activeTab.filters, { filter: "brilho", valor: brightness }],
   };
 }
@@ -110,7 +136,9 @@ async function ApplyBlurFilter(
 ): Promise<Tab> {
   const formData = new FormData();
 
-  formData.append("imagem", activeTab.file);
+  const blob = await urlToBlob(activeTab.previewUrl);
+  formData.append("imagem", blob, "image.png");
+
   formData.append("intensidade", String(desfoque));
 
   if (activeTab.maskFilter) {
@@ -129,12 +157,13 @@ async function ApplyBlurFilter(
 
   if (!res.ok) throw new Error("Erro no endpoint blur");
 
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
+  const resultBlob = await res.blob();
+  const url = URL.createObjectURL(resultBlob);
+
+  const updated = updateHistory(activeTab, url);
 
   return {
-    ...activeTab,
-    previewUrl: url,
+    ...updated,
     filters: [
       ...activeTab.filters,
       { filter: "desfoque", valor: desfoque, type: tipo as TypeOfBlur },
@@ -151,7 +180,9 @@ async function ApplyHighFilter(
 ): Promise<Tab> {
   const formData = new FormData();
 
-  formData.append("imagem", activeTab.file);
+  const blob = await urlToBlob(activeTab.previewUrl);
+  formData.append("imagem", blob, "image.png");
+
   formData.append("intensidade", String(realce));
 
   if (activeTab.maskFilter) {
@@ -170,12 +201,13 @@ async function ApplyHighFilter(
 
   if (!res.ok) throw new Error("Erro no endpoint realce");
 
-  const blob = await res.blob();
-  const url = URL.createObjectURL(blob);
+  const resultBlob = await res.blob();
+  const url = URL.createObjectURL(resultBlob);
+
+  const updated = updateHistory(activeTab, url);
 
   return {
-    ...activeTab,
-    previewUrl: url,
+    ...updated,
     filters: [
       ...activeTab.filters,
       { filter: "realce", valor: realce, type: tipo as TypeOfBlur },
@@ -183,11 +215,15 @@ async function ApplyHighFilter(
   };
 }
 
+// ---------------- SELEÇÃO AUTOMÁTICA ----------------
+
 export async function SelectMaskObjects(tab: Tab): Promise<Tab | undefined> {
   if (!tab) return undefined;
 
   const formData = new FormData();
-  formData.append("imagem", tab.file);
+
+  const blob = await urlToBlob(tab.previewUrl);
+  formData.append("imagem", blob, "image.png");
 
   const res = await fetch("http://localhost:8000/selecionar_objetos", {
     method: "POST",
@@ -196,15 +232,13 @@ export async function SelectMaskObjects(tab: Tab): Promise<Tab | undefined> {
 
   if (!res.ok) return undefined;
 
-  const blob = await res.blob();
+  const resultBlob = await res.blob();
 
-  // converter blob -> imagem
   const img = new Image();
-  img.src = URL.createObjectURL(blob);
+  img.src = URL.createObjectURL(resultBlob);
 
   await new Promise((resolve) => (img.onload = resolve));
 
-  // desenhar no canvas
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d")!;
 
@@ -213,12 +247,7 @@ export async function SelectMaskObjects(tab: Tab): Promise<Tab | undefined> {
 
   ctx.drawImage(img, 0, 0);
 
-  const { data, width, height } = ctx.getImageData(
-    0,
-    0,
-    canvas.width,
-    canvas.height,
-  );
+  const { data, width, height } = ctx.getImageData(0, 0, img.width, img.height);
 
   const matrix: boolean[][] = [];
 
@@ -227,7 +256,6 @@ export async function SelectMaskObjects(tab: Tab): Promise<Tab | undefined> {
 
     for (let x = 0; x < width; x++) {
       const i = (y * width + x) * 4;
-
       const r = data[i];
       row.push(r > 127);
     }
@@ -238,5 +266,31 @@ export async function SelectMaskObjects(tab: Tab): Promise<Tab | undefined> {
   return {
     ...tab,
     maskFilter: matrix,
+  };
+}
+
+// ---------------- UNDO / REDO ----------------
+
+export function undo(tab: Tab): Tab {
+  if (!tab.historic || tab.indexHistoric === undefined) return tab;
+
+  const newIndex = Math.max(0, tab.indexHistoric - 1);
+
+  return {
+    ...tab,
+    indexHistoric: newIndex,
+    previewUrl: tab.historic[newIndex],
+  };
+}
+
+export function redo(tab: Tab): Tab {
+  if (!tab.historic || tab.indexHistoric === undefined) return tab;
+
+  const newIndex = Math.min(tab.historic.length - 1, tab.indexHistoric + 1);
+
+  return {
+    ...tab,
+    indexHistoric: newIndex,
+    previewUrl: tab.historic[newIndex],
   };
 }

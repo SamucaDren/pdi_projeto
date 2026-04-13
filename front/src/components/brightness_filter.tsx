@@ -55,7 +55,9 @@ function BrightnessFilter({
     <div className="container_brightness_filter">
       <div className="brightness_filter">
         <span className="filter_title">Brilho</span>
+        <span className="line"></span>
 
+        <span className="filter_subtitle">Valor:</span>
         <Slider
           value={brightness}
           setValue={setBrightness}

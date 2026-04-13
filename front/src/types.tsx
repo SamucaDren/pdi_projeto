@@ -2,6 +2,8 @@ export type Tab = {
   id: number;
   file: File;
   previewUrl: string;
+  historic?: string[];
+  indexHistoric?: number;
   name: string;
   width: number;
   height: number;
