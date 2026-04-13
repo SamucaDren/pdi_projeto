@@ -71,11 +71,11 @@ function Nav({
             <div
               key={tab.id}
               style={{
-                padding: "4px 24px",
+                padding: "8px 12px 8px 16px",
                 background: tab.id === activeTab ? "#811d1d" : "#222",
                 cursor: "pointer",
                 display: "flex",
-                gap: 6,
+                gap: 16,
                 alignItems: "center",
                 borderRadius: 8,
                 transition: "all .2s ease",

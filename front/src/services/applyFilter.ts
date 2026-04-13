@@ -124,6 +124,8 @@ async function ApplyBrightnessFilter(
   return {
     ...updated,
     filters: [...activeTab.filters, { filter: "brilho", valor: brightness }],
+
+    maskFilter: undefined,
   };
 }
 
@@ -168,6 +170,8 @@ async function ApplyBlurFilter(
       ...activeTab.filters,
       { filter: "desfoque", valor: desfoque, type: tipo as TypeOfBlur },
     ],
+
+    maskFilter: undefined,
   };
 }
 
@@ -212,6 +216,7 @@ async function ApplyHighFilter(
       ...activeTab.filters,
       { filter: "realce", valor: realce, type: tipo as TypeOfBlur },
     ],
+    maskFilter: undefined,
   };
 }
 
@@ -222,7 +227,7 @@ export async function SelectMaskObjects(tab: Tab): Promise<Tab | undefined> {
 
   const formData = new FormData();
 
-  const blob = await urlToBlob(tab.previewUrl);
+  const blob = tab.file;
   formData.append("imagem", blob, "image.png");
 
   const res = await fetch("http://localhost:8000/selecionar_objetos", {

@@ -112,6 +112,8 @@ function Canvas02({
           }
         }
         drawMask();
+      } else {
+        drawMask();
       }
     };
   }, [activeTab, drawMask]);
