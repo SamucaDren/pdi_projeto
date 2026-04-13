@@ -109,3 +109,39 @@ async def converter_imagem(imagem: UploadFile):
     np_img = np.frombuffer(conteudo, np.uint8)
     img = cv2.imdecode(np_img, cv2.IMREAD_COLOR)
     return img
+
+
+
+    
+# ------------------ SELEÇÃO (OTIMIZADA) ------------------
+
+@app.post("/selecionar_objetos")
+def selecionar_objetos(imagem: UploadFile = File(...)):
+    img = converter_imagem(imagem)
+
+    h, w = img.shape[:2]
+
+    # reduz bastante (performance)
+    scale = 0.3
+    small = cv2.resize(img, (int(w * scale), int(h * scale)))
+
+    sh, sw = small.shape[:2]
+
+    mask = np.zeros((sh, sw), np.uint8)
+    rect = (int(sw * 0.1), int(sh * 0.1), int(sw * 0.8), int(sh * 0.8))
+
+    bgdModel = np.zeros((1, 65), np.float64)
+    fgdModel = np.zeros((1, 65), np.float64)
+
+    cv2.grabCut(small, mask, rect, bgdModel, fgdModel, 2, cv2.GC_INIT_WITH_RECT)
+
+    mask_bin = np.where(
+        (mask == cv2.GC_FGD) | (mask == cv2.GC_PR_FGD),
+        255,
+        0
+    ).astype("uint8")
+
+    mask_bin = cv2.resize(mask_bin, (w, h), interpolation=cv2.INTER_NEAREST)
+
+    _, buffer = cv2.imencode(".png", mask_bin)
+    return StreamingResponse(io.BytesIO(buffer.tobytes()), media_type="image/png")

@@ -6,7 +6,7 @@ import Canvas02 from "./components/canvas02";
 import FiltersBar from "./components/filters_bar";
 import EditTools from "./components/edit_tools";
 import PencilBar from "./components/pencil_bar";
-import { ApplyFilter } from "./services/applyFilter";
+import { ApplyFilter, SelectMaskObjects } from "./services/applyFilter";
 
 import type { Tab, Filter, PencilAply, FilterAply } from "./types";
 
@@ -117,6 +117,18 @@ function Index() {
     );
   };
 
+  const handleselectObjectsClick = async () => {
+    if (!currentTab) return;
+
+    const updatedTab = await SelectMaskObjects(currentTab);
+
+    if (!updatedTab) return;
+
+    setTabs((prevTabs) =>
+      prevTabs.map((tab) => (tab.id === currentTab.id ? updatedTab : tab)),
+    );
+  };
+
   return (
     <div>
       <Nav
@@ -141,7 +153,11 @@ function Index() {
       />
 
       {/* agora aceita null corretamente */}
-      <PencilBar Pencil={pencil} setPencilAply={setPencil} />
+      <PencilBar
+        selectObjectsClick={handleselectObjectsClick}
+        Pencil={pencil}
+        setPencilAply={setPencil}
+      />
 
       {/*
       <Canvas

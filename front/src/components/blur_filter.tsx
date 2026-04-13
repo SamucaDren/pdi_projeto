@@ -70,7 +70,7 @@ function BlurFilter({
           value={blur}
           setValue={setBlur}
           min={0}
-          max={30}
+          max={100}
           orientation="horizontal"
         />
       </div>

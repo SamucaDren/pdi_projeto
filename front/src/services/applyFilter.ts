@@ -182,3 +182,61 @@ async function ApplyHighFilter(
     ],
   };
 }
+
+export async function SelectMaskObjects(tab: Tab): Promise<Tab | undefined> {
+  if (!tab) return undefined;
+
+  const formData = new FormData();
+  formData.append("imagem", tab.file);
+
+  const res = await fetch("http://localhost:8000/selecionar_objetos", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) return undefined;
+
+  const blob = await res.blob();
+
+  // converter blob -> imagem
+  const img = new Image();
+  img.src = URL.createObjectURL(blob);
+
+  await new Promise((resolve) => (img.onload = resolve));
+
+  // desenhar no canvas
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d")!;
+
+  canvas.width = img.width;
+  canvas.height = img.height;
+
+  ctx.drawImage(img, 0, 0);
+
+  const { data, width, height } = ctx.getImageData(
+    0,
+    0,
+    canvas.width,
+    canvas.height,
+  );
+
+  const matrix: boolean[][] = [];
+
+  for (let y = 0; y < height; y++) {
+    const row: boolean[] = [];
+
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4;
+
+      const r = data[i];
+      row.push(r > 127);
+    }
+
+    matrix.push(row);
+  }
+
+  return {
+    ...tab,
+    maskFilter: matrix,
+  };
+}
