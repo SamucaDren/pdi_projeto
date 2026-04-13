@@ -114,32 +114,34 @@ async def converter_imagem(imagem: UploadFile):
 
     
 # ------------------ SELEÇÃO (OTIMIZADA) ------------------
-
 @app.post("/selecionar_objetos")
-def selecionar_objetos(imagem: UploadFile = File(...)):
-    img = converter_imagem(imagem)
+async def selecionar_objetos(imagem: UploadFile = File(...)):
+    img = await converter_imagem(imagem)
 
     h, w = img.shape[:2]
 
-    # reduz bastante (performance)
-    scale = 0.3
-    small = cv2.resize(img, (int(w * scale), int(h * scale)))
+
+    scale = 0.5 if max(h, w) < 1000 else 0.3
+    small = cv2.resize(img, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_AREA)
+
+    small = cv2.GaussianBlur(small, (3, 3), 0)
 
     sh, sw = small.shape[:2]
 
     mask = np.zeros((sh, sw), np.uint8)
-    rect = (int(sw * 0.1), int(sh * 0.1), int(sw * 0.8), int(sh * 0.8))
+
+    rect = (1, 1, sw - 2, sh - 2)
 
     bgdModel = np.zeros((1, 65), np.float64)
     fgdModel = np.zeros((1, 65), np.float64)
 
     cv2.grabCut(small, mask, rect, bgdModel, fgdModel, 2, cv2.GC_INIT_WITH_RECT)
 
-    mask_bin = np.where(
-        (mask == cv2.GC_FGD) | (mask == cv2.GC_PR_FGD),
-        255,
-        0
-    ).astype("uint8")
+    mask_bin = ((mask == 1) | (mask == 3)).astype("uint8") * 255
+
+    kernel = np.ones((3, 3), np.uint8)
+
+    mask_bin = cv2.morphologyEx(mask_bin, cv2.MORPH_CLOSE, kernel)
 
     mask_bin = cv2.resize(mask_bin, (w, h), interpolation=cv2.INTER_NEAREST)
 
