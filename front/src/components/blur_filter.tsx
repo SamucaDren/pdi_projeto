@@ -60,6 +60,10 @@ function BlurFilter({
     <div className="blur-filter_container">
       <div className="brightness_filter">
         <span className="filter_title">Desfoque</span>
+        <span className="filter_subtitle">
+          Suaviza a imagem, reduzindo detalhes e ruídos para um aspecto mais
+          uniforme.
+        </span>
         <span className="line"></span>
         <span className="filter_subtitle">Tipo de Desfoque</span>
         <select

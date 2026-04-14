@@ -55,6 +55,10 @@ function BrightnessFilter({
     <div className="container_brightness_filter">
       <div className="brightness_filter">
         <span className="filter_title">Brilho</span>
+        <span className="filter_subtitle">
+          Ajusta a luminosidade da imagem, clareando ou escurecendo os pixels de
+          forma uniforme.
+        </span>
         <span className="line"></span>
 
         <span className="filter_subtitle">Valor:</span>

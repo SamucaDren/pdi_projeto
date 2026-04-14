@@ -59,8 +59,17 @@ function HighFilter({
     <div className="blur-filter_container">
       <div className="brightness_filter">
         <span className="filter_title">Desfoque</span>
-        <span className="filter_title">Tipo de Desfoque</span>
-        <select value={tipo} onChange={(e) => setTipo(e.target.value)}>
+        <span className="filter_subtitle">
+          Destaca bordas e detalhes, evidenciando mudanças de intensidade na
+          imagem.
+        </span>
+        <span className="line"></span>
+        <span className="filter_subtitle">Tipo de Desfoque</span>
+        <select
+          value={tipo}
+          onChange={(e) => setTipo(e.target.value)}
+          className="selectType"
+        >
           <option value="sobel">Sobel</option>
           <option value="laplaciano">Laplaciano</option>
         </select>
