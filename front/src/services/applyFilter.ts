@@ -77,15 +77,19 @@ export async function ApplyFilter({
   if (!tab) return undefined;
 
   if (filter.filter === "brilho") {
-    return ApplyBrightnessFilter(filter.valor, tab);
+    return ApplyBrightnessFilter(filter.valor as number, tab);
   }
 
   if (filter.filter === "desfoque") {
-    return ApplyBlurFilter(filter.valor, filter.type as string, tab);
+    return ApplyBlurFilter(filter.valor as number, filter.type as string, tab);
   }
 
   if (filter.filter === "realce") {
-    return ApplyHighFilter(filter.valor, filter.type as string, tab);
+    return ApplyHighFilter(filter.valor as number, filter.type as string, tab);
+  }
+  
+  if(filter.filter === "acne"){
+    return ApplyAcneFilter(tab)
   }
 
   return undefined;
@@ -271,6 +275,40 @@ export async function SelectMaskObjects(tab: Tab): Promise<Tab | undefined> {
   return {
     ...tab,
     maskFilter: matrix,
+  };
+}
+
+// ---------------- Acne ----------------
+
+async function ApplyAcneFilter(  
+  activeTab: Tab,
+): Promise<Tab> {
+  const formData = new FormData();
+
+  const blob = await urlToBlob(activeTab.previewUrl);
+  formData.append("imagem", blob, "image.png");  
+
+  if (activeTab.maskFilter) {
+    const maskFile = await maskToPngFile(activeTab.maskFilter);
+    formData.append("mask", maskFile);
+  }
+
+  const res = await fetch("http://localhost:8000/acne", {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!res.ok) throw new Error("Erro no endpoint /acne");
+
+  const resultBlob = await res.blob();
+  const url = URL.createObjectURL(resultBlob);
+
+  const updated = updateHistory(activeTab, url);
+
+  return {
+    ...updated,
+    filters: [...activeTab.filters, { filter: "acne" }],
+    maskFilter: undefined,
   };
 }
 

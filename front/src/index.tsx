@@ -219,6 +219,7 @@ function Index() {
         type="file"
         accept="image/*"
         ref={fileInputRef}
+        title="img"
         style={{ display: "none" }}
         onChange={handleFileChange}
       />

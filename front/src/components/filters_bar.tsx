@@ -7,20 +7,15 @@ import type {
 import BrightnessFilter from "./brightness_filter";
 import BlurFilter from "./blur_filter";
 import HighFilter from "./high_filter";
+import AcneFilter from "./acne_filter";
 
 type FiltersBarProps = {
-  activeFilter: Filter | null;
-  //activeTab?: Tab;
-  // onApply?: (url: string) => void;
-  filter: (filter: FilterAply) => void;
-  // getMaskFromCanvas?: (() => boolean[][] | undefined) | null; // novo
+  activeFilter: Filter | null;  
+  filter: (filter: FilterAply) => void;  
 };
 
 function FiltersBar({
-  activeFilter,
-  //activeTab,
-  //onApply,
-  // getMaskFromCanvas,
+  activeFilter,  
   filter,
 }: FiltersBarProps) {
   return (
@@ -31,6 +26,7 @@ function FiltersBar({
       {activeFilter === "brilho" && <BrightnessFilter filterAply={filter} />}
       {activeFilter === "desfoque" && <BlurFilter filterAply={filter} />}
       {activeFilter === "realce" && <HighFilter filterAply={filter} />}
+      {activeFilter === "acne" && <AcneFilter filterAply={filter} />}
     </div>
   );
 }

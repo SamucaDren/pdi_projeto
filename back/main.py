@@ -222,3 +222,23 @@ def selecionar_objetos(imagem: UploadFile = File(...)):
 
     _, buffer = cv2.imencode(".png", mask_bin)
     return StreamingResponse(io.BytesIO(buffer.tobytes()), media_type="image/png")
+
+# ------------------ ACNE ------------------
+
+@app.post("/acne")
+def acne(
+    imagem: UploadFile = File(...),    
+    mask: UploadFile = File(None)
+):
+    img = resize_if_needed(converter_imagem(imagem))
+
+    m = read_mask(mask, img.shape)
+
+    if m is None:
+        return encode_img(img)
+    
+    m = (m * 255).astype("uint8")
+
+    result = cv2.inpaint(img, m, 3, cv2.INPAINT_TELEA)
+
+    return encode_img(result)

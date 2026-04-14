@@ -12,7 +12,7 @@ export type Tab = {
   imageObj?: HTMLImageElement;
 };
 
-export type Filter = "realce" | "desfoque" | "brilho";
+export type Filter = "realce" | "desfoque" | "brilho" | "acne";
 export type TypeOfBlur = "gaussiano" | "media";
 export type TypeOfHigh = "sobel" | "laplaciano";
 export type Pencil = "pincel" | "borracha" | "retangulo";
@@ -24,6 +24,6 @@ export type PencilAply = {
 
 export type FilterAply = {
   filter: Filter;
-  valor: number;
+  valor?: number;
   type?: TypeOfBlur | TypeOfHigh | undefined;
 };
