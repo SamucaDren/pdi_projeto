@@ -174,10 +174,17 @@ def laplaciano(
 # ------------------ SELEÇÃO (OTIMIZADA) ------------------
 
 @app.post("/selecionar_objetos")
-def selecionar_objetos(imagem: UploadFile = File(...)):
+def selecionar_objetos(
+    imagem: UploadFile = File(...),
+    xStart: int = Form(...),
+    yStart: int = Form(...),
+    xEnd: int = Form(...),
+    yEnd: int = Form(...)
+):
     img = converter_imagem(imagem)
 
     h, w = img.shape[:2]
+
 
     max_dim = 800
     scale = min(1.0, max_dim / max(h, w))
@@ -189,22 +196,56 @@ def selecionar_objetos(imagem: UploadFile = File(...)):
 
     mask = np.zeros((sh, sw), np.uint8)
 
+    
+    x1 = int(xStart * scale)
+    y1 = int(yStart * scale)
+    x2 = int(xEnd * scale)
+    y2 = int(yEnd * scale)
 
-    rect = (1, 1, sw - 2, sh - 2)
+
+    x = min(x1, x2)
+    y = min(y1, y2)
+    x_end = max(x1, x2)
+    y_end = max(y1, y2)
+
+
+    w_rect = x_end - x
+    h_rect = y_end - y
+
+
+    if w_rect < 2 or h_rect < 2:
+        return {"error": "Retângulo muito pequeno"}
+
+ 
+    x = max(0, min(x, sw - 2))
+    y = max(0, min(y, sh - 2))
+
+    w_rect = min(w_rect, sw - x - 1)
+    h_rect = min(h_rect, sh - y - 1)
+
+
+    w_rect = max(1, w_rect)
+    h_rect = max(1, h_rect)
+
+    rect = (x, y, w_rect, h_rect)
 
     bgdModel = np.zeros((1, 65), np.float64)
     fgdModel = np.zeros((1, 65), np.float64)
 
+    try:
+        cv2.grabCut(
+            small,
+            mask,
+            rect,
+            bgdModel,
+            fgdModel,
+            5,
+            cv2.GC_INIT_WITH_RECT
+        )
+    except Exception as e:
+        print("Erro no GrabCut:", e)
+        return {"error": "Falha no processamento"}
 
-    cv2.grabCut(
-        small,
-        mask,
-        rect,
-        bgdModel,
-        fgdModel,
-        5,
-        cv2.GC_INIT_WITH_RECT
-    )
 
     mask_bin = np.where(
         (mask == cv2.GC_FGD) | (mask == cv2.GC_PR_FGD),
@@ -212,16 +253,22 @@ def selecionar_objetos(imagem: UploadFile = File(...)):
         0
     ).astype("uint8")
 
-
+   
     kernel = np.ones((3, 3), np.uint8)
     mask_bin = cv2.morphologyEx(mask_bin, cv2.MORPH_OPEN, kernel, iterations=1)
     mask_bin = cv2.morphologyEx(mask_bin, cv2.MORPH_DILATE, kernel, iterations=1)
 
-  
+ 
     mask_bin = cv2.resize(mask_bin, (w, h), interpolation=cv2.INTER_NEAREST)
 
     _, buffer = cv2.imencode(".png", mask_bin)
-    return StreamingResponse(io.BytesIO(buffer.tobytes()), media_type="image/png")
+
+    return StreamingResponse(
+        io.BytesIO(buffer.tobytes()),
+        media_type="image/png"
+    )
+
+
 
 # ------------------ ACNE ------------------
 

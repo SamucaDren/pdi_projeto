@@ -58,8 +58,7 @@
   gap: 6px;
 
   .option_icon {
-    stroke: var(--red);
-    fill: transparent;
+    fill: var(--red);
   }
 
   &:hover {
@@ -78,6 +77,8 @@
 
 .option_active {
   background-color: var(--red);
-  stroke: var(--neutral00);
+}
+
+.option_active .option_icon {
   fill: var(--neutral00);
 }

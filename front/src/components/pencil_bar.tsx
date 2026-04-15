@@ -6,13 +6,13 @@ import Slider from "./Slider";
 type PencilBarProps = {
   Pencil: PencilAply | null;
   setPencilAply: (p: PencilAply | null) => void;
-  selectObjectsClick: () => void;
+  //selectObjectsClick?: () => void;
 };
 
 function PencilBar({
   Pencil,
   setPencilAply,
-  selectObjectsClick,
+  // selectObjectsClick,
 }: PencilBarProps) {
   const [pencilWeight, setPencilWeight] = useState(() => Pencil?.valor ?? 10);
 
@@ -132,12 +132,16 @@ function PencilBar({
         <span>Retangulo</span>
       </div>
 
-      {/* RETANGULO */}
+      <div className="lineVertical"></div>
+
+      {/* SELEÇÃO INTELIGENTE */}
       <div
         className={
-          "pencilOption" + (pencilType === "retangulo" ? " option_active" : "")
+          "pencilOption" +
+          (pencilType === "selecao_inteligente" ? " option_active" : "")
         }
-        onClick={() => selectObjectsClick()}
+        //        onClick={() => selectObjectsClick()}
+        onClick={() => handleTypeChange("selecao_inteligente")}
       >
         <svg
           width="24"
@@ -155,7 +159,7 @@ function PencilBar({
           <path d="M17.7375 4.32319C17.6399 4.22558 17.4816 4.22562 17.384 4.32319L4.32322 17.384C4.22559 17.4816 4.22559 17.6399 4.32322 17.7375L6.26224 19.6765C6.35987 19.7742 6.51817 19.7742 6.6158 19.6765L19.6766 6.61577C19.7741 6.51813 19.7742 6.35983 19.6766 6.26221L17.7375 4.32319ZM20.3837 5.55511C20.8718 6.04324 20.8718 6.83471 20.3837 7.32287L7.3229 20.3836C6.83475 20.8718 6.04329 20.8718 5.55514 20.3836L3.61612 18.4446C3.12796 17.9565 3.12796 17.165 3.61612 16.6768L16.6769 3.61609C17.165 3.12799 17.9565 3.12795 18.4446 3.61609L20.3837 5.55511Z" />
         </svg>
 
-        <span>Selecionar Objetos</span>
+        <span>Seleção inteligente</span>
       </div>
     </div>
   );

@@ -15,6 +15,7 @@ type CanvasProps = {
   activeTab: Tab | undefined;
   activePencil?: PencilAply | null;
   zoom: number;
+  setInteligentMask?: (valor: number[]) => void;
   onMaskChange?: (mask: boolean[][]) => void;
 };
 
@@ -23,9 +24,11 @@ function Canvas02({
   activePencil,
   zoom,
   onMaskChange,
+  setInteligentMask,
 }: CanvasProps) {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [maskCanvas, setMaskCanvas] = useState<HTMLCanvasElement | null>(null);
+  // const [rectInteligen, setRectInteligente] = useState<number[] | null>(null);
 
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null);
 
@@ -55,7 +58,9 @@ function Canvas02({
   const isBrush =
     activePencil?.pencil === "pincel" || activePencil?.pencil === "borracha";
 
-  const isRect = activePencil?.pencil === "retangulo";
+  const isRect =
+    activePencil?.pencil === "retangulo" ||
+    activePencil?.pencil === "selecao_inteligente";
 
   const isInteractionMode = isBrush || isRect;
 
@@ -122,15 +127,22 @@ function Canvas02({
     const stage = stageRef.current;
     if (!stage || !bounds || !activeTab) return null;
 
-    const p = stage.getPointerPosition();
-    if (!p) return null;
+    const pointer = stage.getPointerPosition();
+    if (!pointer) return null;
 
     const scale = zoom / 100;
 
-    return {
-      x: ((p.x - bounds.x) / scale) * (activeTab.width / bounds.width),
-      y: ((p.y - bounds.y) / scale) * (activeTab.height / bounds.height),
-    };
+    const xRel = (pointer.x - bounds.x) / scale;
+    const yRel = (pointer.y - bounds.y) / scale;
+
+    if (xRel < 0 || yRel < 0 || xRel > bounds.width || yRel > bounds.height) {
+      return null;
+    }
+
+    const x = (xRel / bounds.width) * activeTab.width;
+    const y = (yRel / bounds.height) * activeTab.height;
+
+    return { x, y };
   };
 
   const paintCircle = (cx: number, cy: number, erase = false) => {
@@ -250,22 +262,33 @@ function Canvas02({
     lastPointRef.current = pos;
     drawMask();
   };
-
   const handleMouseUp = () => {
     const pos = getPos();
 
-    if (isRectDrawing && startRectRef.current && pos) {
+    if (isRectDrawing && startRectRef.current && pos && activePencil) {
       const start = startRectRef.current;
 
-      paintRect(
-        start.x,
-        start.y,
-        pos.x,
-        pos.y,
-        activePencil?.pencil === "borracha",
-      );
+      // ✅ seleção inteligente (chama API uma vez)
+      if (activePencil.pencil === "selecao_inteligente") {
+        setInteligentMask?.([
+          Math.floor(Math.min(start.x, pos.x)),
+          Math.floor(Math.min(start.y, pos.y)),
+          Math.floor(Math.max(start.x, pos.x)),
+          Math.floor(Math.max(start.y, pos.y)),
+        ]);
+      }
 
-      drawMask();
+      // ✅ retângulo normal (desenha na máscara)
+      if (activePencil.pencil === "retangulo") {
+        paintRect(start.x, start.y, pos.x, pos.y, false);
+        drawMask();
+      }
+
+      // ✅ borracha com retângulo (se quiser suportar)
+      if (activePencil.pencil === "borracha") {
+        paintRect(start.x, start.y, pos.x, pos.y, true);
+        drawMask();
+      }
     }
 
     setRectPreview(null);

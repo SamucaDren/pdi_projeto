@@ -87,9 +87,9 @@ export async function ApplyFilter({
   if (filter.filter === "realce") {
     return ApplyHighFilter(filter.valor as number, filter.type as string, tab);
   }
-  
-  if(filter.filter === "acne"){
-    return ApplyAcneFilter(tab)
+
+  if (filter.filter === "acne") {
+    return ApplyAcneFilter(tab);
   }
 
   return undefined;
@@ -226,13 +226,25 @@ async function ApplyHighFilter(
 
 // ---------------- SELEÇÃO AUTOMÁTICA ----------------
 
-export async function SelectMaskObjects(tab: Tab): Promise<Tab | undefined> {
+export async function SelectMaskObjects(
+  tab: Tab,
+  rectPosition: number[] | undefined,
+): Promise<Tab | undefined> {
   if (!tab) return undefined;
 
   const formData = new FormData();
 
-  const blob = tab.file;
+  const blob = await getResizedPreviewBlob(tab);
   formData.append("imagem", blob, "image.png");
+  if (rectPosition && rectPosition.length === 4) {
+    formData.append("xStart", String(rectPosition[0]));
+    formData.append("yStart", String(rectPosition[1]));
+    formData.append("xEnd", String(rectPosition[2]));
+    formData.append("yEnd", String(rectPosition[3]));
+  } else {
+    console.error("rectPosition inválido:", rectPosition);
+    return undefined;
+  }
 
   const res = await fetch("http://localhost:8000/selecionar_objetos", {
     method: "POST",
@@ -278,15 +290,35 @@ export async function SelectMaskObjects(tab: Tab): Promise<Tab | undefined> {
   };
 }
 
+async function getResizedPreviewBlob(tab: Tab): Promise<Blob> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.src = tab.previewUrl;
+
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d")!;
+
+      // tamanho original do arquivo
+      canvas.width = tab.width;
+      canvas.height = tab.height;
+
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob((blob) => {
+        resolve(blob!);
+      }, "image/png");
+    };
+  });
+}
+
 // ---------------- Acne ----------------
 
-async function ApplyAcneFilter(  
-  activeTab: Tab,
-): Promise<Tab> {
+async function ApplyAcneFilter(activeTab: Tab): Promise<Tab> {
   const formData = new FormData();
 
   const blob = await urlToBlob(activeTab.previewUrl);
-  formData.append("imagem", blob, "image.png");  
+  formData.append("imagem", blob, "image.png");
 
   if (activeTab.maskFilter) {
     const maskFile = await maskToPngFile(activeTab.maskFilter);

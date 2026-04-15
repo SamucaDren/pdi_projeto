@@ -15,11 +15,16 @@ export type Tab = {
 export type Filter = "realce" | "desfoque" | "brilho" | "acne";
 export type TypeOfBlur = "gaussiano" | "media";
 export type TypeOfHigh = "sobel" | "laplaciano";
-export type Pencil = "pincel" | "borracha" | "retangulo";
+export type Pencil =
+  | "pincel"
+  | "borracha"
+  | "retangulo"
+  | "selecao_inteligente";
 
 export type PencilAply = {
   pencil: Pencil | null;
-  valor: number;
+  valor?: number;
+  rectPosition?: [];
 };
 
 export type FilterAply = {
